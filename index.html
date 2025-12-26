@@ -372,7 +372,19 @@
               console.log('🏒 SUBSCRIBER MODE: Loading embedded team config');
               return EMBEDDED_CONFIG.teamSetup;
             }
-            // Default for master site (Delano)
+            
+            // Master site: try to load from localStorage first
+            try {
+              const saved = localStorage.getItem('myTeamSetup');
+              if (saved) {
+                console.log('📋 Loading saved myTeamSetup from localStorage');
+                return JSON.parse(saved);
+              }
+            } catch (error) {
+              console.error('Error loading saved myTeamSetup:', error);
+            }
+            
+            // Default for master site if nothing saved
             return {
               teamName: 'Delano Tigers',
               logo: null,
@@ -608,20 +620,8 @@
                 localStorage.setItem('hockey-scout-career-stats', JSON.stringify(EMBEDDED_CONFIG.teamSetup.careerStats));
                 console.log('📦 Loaded', Object.keys(EMBEDDED_CONFIG.teamSetup.careerStats).length, 'embedded career stat records');
               }
-              
-              // Don't override myTeamSetup from localStorage in subscriber mode
-              return;
             }
-            
-            // Master site: load from localStorage
-            try {
-              const saved = localStorage.getItem('myTeamSetup');
-              if (saved) {
-                setMyTeamSetup(JSON.parse(saved));
-              }
-            } catch (error) {
-              console.error('Error loading saved setup:', error);
-            }
+            // Note: myTeamSetup is now loaded via getInitialTeamSetup() instead of here
           }, []);
 
           // Save setup to localStorage whenever it changes
@@ -2974,7 +2974,7 @@
                     
                     <div className="p-6">
                       <div className="bg-purple-50 p-4 rounded mb-4">
-                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.3.1</h3>
+                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.3.2</h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Copy this JSON configuration and send it to Claude to build a customized subscriber version. 
                         </p>
